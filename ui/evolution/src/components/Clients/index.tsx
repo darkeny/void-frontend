@@ -35,6 +35,7 @@ const Customers: React.FC = () => {
         const fetchToken = async () => {
             const userToken = await authenticateUser();
             setToken(userToken);
+            
         };
         fetchToken();
     }, []);

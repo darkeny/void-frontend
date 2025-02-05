@@ -7,7 +7,9 @@ import { useNavigate, Link } from 'react-router-dom'; // Import Link from react-
 import { useAuth } from '../../auth';
 import { handleError } from '../../handleError';
 
-const apiUrl = import.meta.env.VITE_APP_API_URL;
+
+const VALID_EMAIL = "jobar@void.co.mz";
+const VALID_PASSWORD = "frontend";
 
 const SignIn: React.FC = () => {
     const navigate = useNavigate();
@@ -40,38 +42,14 @@ const SignIn: React.FC = () => {
         setUserType(event.target.value);
     };
 
-    const onSubmit = async (event: React.FormEvent) => {
+    const onSubmit = (event: { preventDefault: () => void; }) => {
         event.preventDefault();
-        setFormSubmitted(true);
-        setLoading(true);
-
-        if (!email || !password) {
-            setModalText('Por favor, preencha todos os campos obrigatórios.');
+        
+        if (email === VALID_EMAIL && password === VALID_PASSWORD) {
+            navigate('/panel');
+        } else {
+            setModalText('Email ou senha incorretos!');
             setModalOpen(true);
-            setLoading(false);
-            return;
-        }
-
-        try {
-            const requestData = { email, password };
-            const endpoint = userType === 'admin' ? '/admin/login' : '/user/login';
-            const response = await axios.post(`${apiUrl}${endpoint}`, requestData, {
-                headers: { 'Content-Type': 'application/json' },
-            });
-
-            const { token } = response.data;
-            setAuth(token);
-            if (userType === 'admin') {
-                navigate('/panel');
-            } else {
-                navigate('/mypanel');
-            }
-        } catch (error: any) {
-            const errorMessage = handleError(error);
-            setModalText(errorMessage);
-            setModalOpen(true);
-        } finally {
-            setLoading(false);
         }
     };
 
