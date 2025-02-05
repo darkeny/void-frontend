@@ -44,6 +44,11 @@ const Insumos: React.FC = () => {
 
 
     useEffect(() => {
+        if (!token) return;
+        fetchSectors(token).then(setSectors);
+    }, [token]);
+
+    useEffect(() => {
         if (!selectedSector || !token) return;
         fetchAreas(token, selectedSector).then(setAreas);
     }, [selectedSector, token]);
@@ -68,9 +73,11 @@ const Insumos: React.FC = () => {
                             value={selectedSector}
                             onChange={(e) => setSelectedSector(e.target.value)}
                         >
-                            <option value="">Setor</option>
+                            <option value="">Sector</option>
                             {sectors.map((sector) => (
-                                <option key={sector.id} value={sector.id}>{sector.name}</option>
+                                <option key={sector.id} value={sector.id}>
+                                    {sector.name}
+                                </option>
                             ))}
                         </select>
 
@@ -79,9 +86,11 @@ const Insumos: React.FC = () => {
                             value={selectedArea}
                             onChange={(e) => setSelectedArea(e.target.value)}
                         >
-                            <option value="">Área</option>
+                            <option value="">Area</option>
                             {areas.map((area) => (
-                                <option key={area.id} value={area.id}>{area.name}</option>
+                                <option key={area.id} value={area.id}>
+                                    {area.name}
+                                </option>
                             ))}
                         </select>
                     </div>
