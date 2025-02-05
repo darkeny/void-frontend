@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "esnext", // ou "es2020"
+    "module": "esnext", // ou "es2020"
+    "moduleResolution": "node",
+    "strict": true,
+    "jsx": "react-jsx", // use "react" se estiver usando React 16.14 ou anterior
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "types": ["vite/client"],
+    "noEmit": true // impede a saída de arquivos compilados
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx", "vite-env.d.ts"]
+}
