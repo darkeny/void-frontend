@@ -10,19 +10,12 @@ const Panel: React.FC = () => {
         logout();
     };
 
-    const [activeTab, setActiveTab] = useState<'progress_analysis' | 'clients' | 'posts' | 'loans'>('progress_analysis');
+    const [activeTab, setActiveTab] = useState<'progress_analysis' | 'clients' >('progress_analysis');
     const [userMenuOpen, setUserMenuOpen] = useState(false);
     const renderContent = () => {
         if (activeTab === 'clients') {
             return <Clients />;
         }
-        if (activeTab === 'posts') {
-            return <Clients />;
-        }
-
-        if (activeTab === 'loans') {
-        }
-
         return (
 
             <>

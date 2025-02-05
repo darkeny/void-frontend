@@ -14,86 +14,77 @@ interface Sector {
     name: string;
 }
 
+interface Area {
+    id: string;
+    name: string;
+}
+
 const Customers: React.FC = () => {
     const [token, setToken] = useState<string | null>(null);
-    const [data, setData] = useState<any[]>([]);
     const [sectors, setSectors] = useState<Sector[]>([]);
-
-    const [areas, setAreas] = useState<any[]>([]);
-    const [searchTerm, setSearchTerm] = useState('');
+    const [areas, setAreas] = useState<Area[]>([]);
     const [selectedSector, setSelectedSector] = useState('');
     const [selectedArea, setSelectedArea] = useState('');
+    const [searchTerm, setSearchTerm] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [alertText, setAlertText] = useState('');
 
-    // Authenticate user and get token
+    // Autenticação e obtenção do token
     useEffect(() => {
+        const authenticateUser = async () => {
+            try {
+                const response = await axios.post(`${API_BASE}/users/login`, LOGIN_CREDENTIALS);
+                setToken(response.data?.data?.token);
+            } catch (error) {
+                console.error('Erro ao autenticar:', error);
+            }
+        };
+
         authenticateUser();
     }, []);
 
-    // Fetch data when token is available
+    // Buscar setores quando o token estiver disponível
     useEffect(() => {
-        if (token) {
-            fetchSectors();
-            fetchData();
-        }
+        if (!token) return;
+
+        const fetchSectors = async () => {
+            try {
+                const response = await axios.get<{ data: { data: Sector[] } }>(
+                    `${API_BASE}/sectors/all/de190ded-d23c-410c-89ac-89faf4dfb36a`,
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
+                setSectors(response.data?.data?.data || []);
+            } catch (error) {
+                console.error('Erro ao buscar setores:', error);
+            }
+        };
+
+        fetchSectors();
     }, [token]);
 
-    // Fetch areas when a sector is selected
+    // Buscar áreas quando um setor for selecionado
     useEffect(() => {
-        if (selectedSector) {
-            fetchAreas(selectedSector);
-        }
-    }, [selectedSector]);
+        if (!selectedSector || !token) return;
 
-    const authenticateUser = async () => {
-        try {
-            const response = await axios.post(`${API_BASE}/users/login`, LOGIN_CREDENTIALS);
-            setToken(response.data.data.token);
-        } catch (error) {
-            console.error('Erro ao autenticar:', error);
-        }
-    };
+        const fetchAreas = async () => {
+            try {
+                const response = await axios.get<{ data: Area[] }>(
+                    `${API_BASE}/areas?sector=${selectedSector}`,
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
+                setAreas(response.data?.data || []);
+            } catch (error) {
+                console.error('Erro ao buscar áreas:', error);
+            }
+        };
 
-    const fetchData = async () => {
-        try {
-            const response = await axios.get(`https://sonil-dev.void.co.mz/api/v4/last-week/de190ded-d23c-410c-89ac-89faf4dfb36a?=&_limit=10`, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            setData(response.data);
-            console.log("Dados do setor", response)
-        } catch (error) {
-            console.error('Erro ao buscar dados:', error);
-        }
-    };
-    const fetchSectors = async () => {
-        try {
-            const response = await axios.get<{ data: Sector[] }>(`${API_BASE}/sectors/all/de190ded-d23c-410c-89ac-89faf4dfb36a`, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            // Acesse os dados corretamente
-            setSectors(response.data.data);
-        } catch (error) {
-            console.error('Erro ao buscar setores:', error);
-        }
-    };
-
-    const fetchAreas = async (sectorId: string) => {
-        
-        try {
-            const response = await axios.get(`https://sonil-dev.void.co.mz/api/v4/areas?sector=${sectorId}`, {
-                headers: { Authorization: `Bearer ${token}` },
-                params: { sector: sectorId },
-            });
-            setAreas(response.data);
-        } catch (error) {
-            console.error('Erro ao buscar áreas:', error);
-        }
-    };
+        fetchAreas();
+    }, [selectedSector, token]);
 
     return (
         <div className="container mx-auto">
             <div className="flex gap-4 mb-4">
+                {/* Campo de pesquisa */}
                 <input
                     type="search"
                     placeholder="Pesquisar por técnico..."
@@ -101,6 +92,8 @@ const Customers: React.FC = () => {
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="border-2 bg-white h-10 px-5 pr-16 rounded-lg text-sm w-full"
                 />
+
+                {/* Select de setores */}
                 <select
                     className="border-2 h-10 px-3 rounded-lg"
                     value={selectedSector}
@@ -117,48 +110,40 @@ const Customers: React.FC = () => {
                         <option value="">Carregando setores...</option>
                     )}
                 </select>
+
+                {/* Select de áreas */}
                 <select
                     className="border-2 h-10 px-3 rounded-lg"
                     value={selectedArea}
                     onChange={(e) => setSelectedArea(e.target.value)}
                 >
                     <option value="">Selecione uma área</option>
-                  
                     {areas.map((area) => (
-                        <option key={area.id} value={area.id}>{area.name}</option>
-                    ))} 
+                        <option key={area.id} value={area.id}>
+                            {area.name}
+                        </option>
+                    ))}
                 </select>
             </div>
 
+            {/* Tabela de técnicos (você pode preencher os dados quando tiver) */}
             <table className="min-w-full divide-y divide-gray-200 shadow-2xl">
                 <thead className="bg-gray-50">
                     <tr>
-                        <th className="px-6 py-3 text-left font-medium text-xs leading-5 text-gray-500">id</th>
+                        <th className="px-6 py-3 text-left font-medium text-xs leading-5 text-gray-500">ID</th>
                         <th className="px-6 py-3 text-left font-medium text-xs leading-5 text-gray-500">Área</th>
                         <th className="px-6 py-3 text-left font-medium text-xs leading-5 text-gray-500">Técnico</th>
                         <th className="px-6 py-3 text-left font-medium text-xs leading-5 text-gray-500">Semana 1</th>
                         <th className="px-6 py-3 text-left font-medium text-xs leading-5 text-gray-500">Semana 2</th>
                         <th className="px-6 py-3 text-left font-medium text-xs leading-5 text-gray-500">Semana 3</th>
-                        <th className="px-6 py-3 text-left font-medium text-xs leading-5 text-gray-500">Eliminar</th>
                     </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                    {/* {data.map((technician_id) => (
-                        <tr key={technician_id.id}>
-                            <td className="px-6 py-4 text-xs text-gray-500">{technician_id.sector}</td>
-                            <td className="px-6 py-4 text-xs text-gray-500">{technician_id.area}</td>
-                            <td className="px-6 py-4 text-xs text-gray-500">{technician_id.tecnico}</td>
-                            <td className="px-6 py-4 text-xs text-gray-500">{technician_id.semana1}</td>
-                            <td className="px-6 py-4 text-xs text-gray-500">{technician_id.semana2}</td>
-                            <td className="px-6 py-4 text-xs text-gray-500">{technician_id.semana3}</td>
-                            <td className="px-6 py-4 text-lg text-gray-500">
-                                <DeleteModal text="Eliminar" subtitles="Tem certeza?" onSubmit={() => console.log(`Excluir ID: ${technician_id.id}`)} id={technician_id.id} />
-                            </td>
-                        </tr>
-                    ))} */}
+                  
                 </tbody>
             </table>
 
+            {/* Modal de alerta */}
             <Alert text={alertText} isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
         </div>
     );
