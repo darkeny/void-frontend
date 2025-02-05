@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../auth';
 import Clients from '../../components/Clients';
-import { Posts } from '../../components/posts';
 import { Link } from 'react-router-dom';
 const Panel: React.FC = () => {
 

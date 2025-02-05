@@ -143,7 +143,7 @@ const Customers: React.FC = () => {
                     </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                    {data.map((technician_id) => (
+                    {/* {data.map((technician_id) => (
                         <tr key={technician_id.id}>
                             <td className="px-6 py-4 text-xs text-gray-500">{technician_id.sector}</td>
                             <td className="px-6 py-4 text-xs text-gray-500">{technician_id.area}</td>
@@ -155,7 +155,7 @@ const Customers: React.FC = () => {
                                 <DeleteModal text="Eliminar" subtitles="Tem certeza?" onSubmit={() => console.log(`Excluir ID: ${technician_id.id}`)} id={technician_id.id} />
                             </td>
                         </tr>
-                    ))}
+                    ))} */}
                 </tbody>
             </table>
 
