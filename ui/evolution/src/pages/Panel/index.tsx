@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../../auth';
 import Clients from '../../components/Clients';
 import { Link } from 'react-router-dom';
+import Insumos from '../../components/Insumos';
 const Panel: React.FC = () => {
 
     const { logout } = useAuth();
@@ -10,21 +11,20 @@ const Panel: React.FC = () => {
         logout();
     };
 
-    const [activeTab, setActiveTab] = useState<'progress_analysis' | 'clients' >('progress_analysis');
+    const [activeTab, setActiveTab] = useState<'progress_analysis' | 'insumos' >('progress_analysis');
     const [userMenuOpen, setUserMenuOpen] = useState(false);
     const renderContent = () => {
-        if (activeTab === 'clients') {
+        if (activeTab === 'progress_analysis') {
             return <Clients />;
         }
         return (
 
             <>
-                <Clients />
+                <Insumos />
             </>
         );
 
     };
-
 
     return (
         <>
@@ -35,7 +35,7 @@ const Panel: React.FC = () => {
                             <div className="flex items-center">
                                 <Link to={'/'}>
                                     <div className="flex-shrink-0">
-                                        <img className="h-8 w-8" src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=600" alt="Your Company" />
+                                        <img className="h-8 w-8" src="https://i.ibb.co/236WzwHz/Grupo-2917.png" alt="Your Company" />
                                     </div>
                                 </Link>
                                 <div className="hidden md:block">
@@ -44,7 +44,7 @@ const Panel: React.FC = () => {
                                             className={`rounded-md px-3 py-2 text-sm font-medium ${activeTab === 'progress_analysis' ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'}`} onClick={() => setActiveTab('progress_analysis')} aria-current="page">Analise de Progresso
                                         </a>
                                         <a href="#"
-                                            className={`rounded-md px-3 py-2 text-sm font-medium ${activeTab === 'clients' ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'}`} onClick={() => setActiveTab('clients')}>Insumos
+                                            className={`rounded-md px-3 py-2 text-sm font-medium ${activeTab === 'insumos' ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'}`} onClick={() => setActiveTab('insumos')}>Insumos
                                         </a>
 
                                     </div>
