@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { FaLongArrowAltDown } from "react-icons/fa";
 import { FaLongArrowAltUp } from "react-icons/fa";
-import { authenticateUser, fetchSectors, fetchAreas } from '../../axios/api';
+import { authenticateUser, fetchSectors, fetchAreas, fetchInsumos } from '../../axios/api';
 import { Alert } from '../Modal/alert';
 
-interface Distribution {
+interface Viveiro {
     sector: string;
     area_name: string;
     technician_name: string;
@@ -27,7 +27,7 @@ interface Area {
 
 const Insumos: React.FC = () => {
     const [token, setToken] = useState<string | null>(null);
-    const [data, setData] = useState<Distribution[]>([]);
+    const [viveiro, setViveiro] = useState<Viveiro[]>([]);
     const [sectors, setSectors] = useState<Sector[]>([]);
     const [areas, setAreas] = useState<Area[]>([]);
     const [selectedSector, setSelectedSector] = useState('');
@@ -55,12 +55,38 @@ const Insumos: React.FC = () => {
         fetchAreas(token, selectedSector).then(setAreas);
     }, [selectedSector, token]);
 
-    const filteredData = data.filter(({ sector, area_name }) => {
+    useEffect(() => {
+        if (!token) return;
+        fetchInsumos(token).then((data) => {
+            console.log("Insumos brutos:", data);
+
+            // Transformando os dados no formato esperado
+            if (data && data.sectors) {
+                const formattedData = data.sectors.map(sector => ({
+                    sector: sector.name,
+                    area_name: "-", // Adapte conforme necessário
+                    technician_name: "-", // Adapte conforme necessário
+                    producers: sector.totalFarmers || 0,
+                    seeds_x_distributed: sector.packages.find(p => p.name === "Semente X")?.sent || 0,
+                    seeds_x_received: sector.packages.find(p => p.name === "Semente X")?.received || 0,
+                    seeds_y_distributed: sector.packages.find(p => p.name === "Semente Y")?.sent || 0,
+                    seeds_y_received: sector.packages.find(p => p.name === "Semente Y")?.received || 0,
+                }));
+
+                setViveiro(formattedData);
+            }
+        });
+    }, [token]);
+
+
+
+
+
+
+    const filteredData = Array.isArray(viveiro) ? viveiro.filter(({ sector }) => {
         const sectorName = sectors.find(s => s.id === selectedSector)?.name.toLowerCase();
-        const areaName = areas.find(a => a.id === selectedArea)?.name.toLowerCase();
-        return (!selectedSector || sector.toLowerCase() === sectorName)
-            && (!selectedArea || area_name.toLowerCase() === areaName);
-    });
+        return (!selectedSector || sector.toLowerCase() === sectorName);
+    }) : [];
 
     return (
 
@@ -136,18 +162,40 @@ const Insumos: React.FC = () => {
 
                 <tbody className="bg-white divide-y divide-gray-200">
                     {filteredData.length > 0 ? (
-                        filteredData.map((row, index) => (
-                            <tr key={index}>
-                                <td className="px-6 py-4 text-xs">{row.sector}</td>
-                                <td className="px-6 py-4 text-xs">{row.area_name}</td>
-                                <td className="px-6 py-4 text-xs">{row.technician_name}</td>
-                                <td className="px-6 py-4 text-xs">{row.producers}</td>
-                                <td className="px-6 py-4 text-xs">{row.seeds_x_distributed}</td>
-                                <td className="px-6 py-4 text-xs">{row.seeds_x_received}</td>
-                                <td className="px-6 py-4 text-xs">{row.seeds_y_distributed}</td>
-                                <td className="px-6 py-4 text-xs">{row.seeds_y_received}</td>
+                        <>
+                            {filteredData.map((row, index) => (
+                                <tr key={index}>
+                                    <td className="px-6 py-4 text-xs">{row.sector}</td>
+                                    <td className="px-6 py-4 text-xs">{row.area_name}</td>
+                                    <td className="px-6 py-4 text-xs">{row.technician_name}</td>
+                                    <td className="px-6 py-4 text-xs">{Number(row.producers).toFixed(2)}</td>
+                                    <td className="px-6 py-4 text-xs">{Number(row.seeds_x_distributed).toFixed(2)}</td>
+                                    <td className="px-6 py-4 text-xs">{Number(row.seeds_x_received).toFixed(2)}</td>
+                                    <td className="px-6 py-4 text-xs">{Number(row.seeds_y_distributed).toFixed(2)}</td>
+                                    <td className="px-6 py-4 text-xs">{Number(row.seeds_y_received).toFixed(2)}</td>
+                                </tr>
+                            ))}
+
+                            {/* Linha de total */}
+                            <tr className="bg-gray-100 font-bold">
+                                <td className="px-6 py-4 text-xs leading-5 text-gray-700" colSpan={3}>Total</td>
+                                <td className="px-6 py-4 text-xs leading-5 text-gray-700">
+                                    {filteredData.reduce((sum, row) => sum + (Number(row.producers) || 0), 0).toFixed(2)}
+                                </td>
+                                <td className="px-6 py-4 text-xs leading-5 text-gray-700">
+                                    {filteredData.reduce((sum, row) => sum + (Number(row.seeds_x_distributed) || 0), 0).toFixed(2)}
+                                </td>
+                                <td className="px-6 py-4 text-xs leading-5 text-gray-700">
+                                    {filteredData.reduce((sum, row) => sum + (Number(row.seeds_x_received) || 0), 0).toFixed(2)}
+                                </td>
+                                <td className="px-6 py-4 text-xs leading-5 text-gray-700">
+                                    {filteredData.reduce((sum, row) => sum + (Number(row.seeds_y_distributed) || 0), 0).toFixed(2)}
+                                </td>
+                                <td className="px-6 py-4 text-xs leading-5 text-gray-700">
+                                    {filteredData.reduce((sum, row) => sum + (Number(row.seeds_y_received) || 0), 0).toFixed(2)}
+                                </td>
                             </tr>
-                        ))
+                        </>
                     ) : (
                         <tr>
                             <td colSpan={8} className="px-6 py-4 text-center text-gray-500 text-lg font-medium">
@@ -157,6 +205,7 @@ const Insumos: React.FC = () => {
                     )}
                 </tbody>
             </table>
+
 
             <Alert text={alertText} isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
         </div>

@@ -52,3 +52,16 @@ export const fetchAreas = async (token: string, selectedSector: string) => {
         return [];
     }
 };
+
+export const fetchInsumos = async (token: string) => {
+    try {
+        const response = await axios.get(`${API_BASE}/analytics/farm-inputs/23e9336a-b20a-4478-a58f-875cc065e871?offset=1&limit=10?&filter=&phase=nurseries`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        return response.data?.data || [];
+        
+    } catch (error) {
+        console.error('Erro ao buscar insumos:', error);
+        return [];
+    }
+};
