@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { FaLongArrowAltDown } from "react-icons/fa";
+import { FaLongArrowAltUp } from "react-icons/fa";
 import { authenticateUser, fetchSectors, fetchAreas } from '../../axios/api';
 import { Alert } from '../Modal/alert';
 
@@ -96,13 +98,15 @@ const Insumos: React.FC = () => {
                     </div>
                     <button
                         type="submit"
-                        className="relative rounded-md bg-blue-600 px-8 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-lg hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                        className="flex items-center gap-2 rounded-md bg-blue-600 px-8 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-lg hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
                         Adicionar Distribuição
+                        <FaLongArrowAltUp />
                     </button>
                     <button
                         type="submit"
-                        className="relative rounded-md bg-blue-600 px-8 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-lg hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                        className="flex items-center gap-2 rounded-md bg-blue-600 px-8 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-lg hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
                         Exportar Relatórios
+                        <FaLongArrowAltDown />
                     </button>
                 </div>
             </div>
